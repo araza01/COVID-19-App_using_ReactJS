@@ -56,8 +56,8 @@ export default class Covid19 extends Component {
                     <div>
                         <ul>
                             {
-                                Object.keys(output).map((stats, i) => {
-                                    return <li key={stats}>{stats.TotalConfirmed}</li>;
+                                Object.keys(output).map((stats) => {
+                                    return stats.TotalConfirmed;
                                 })
                             }
                         </ul>
