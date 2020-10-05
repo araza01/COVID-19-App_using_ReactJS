@@ -6,9 +6,13 @@ export default class Covid19 extends Component {
         this.state = {
             isLoaded: false,
             error: null,
-            output: []
+            output: {},
+            input: "",
+            data: []
         }
         this.handleNumbers = this.handleNumbers.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.handleData = this.handleData.bind(this);
     }
 
     handleNumbers = (num) => {
@@ -17,8 +21,30 @@ export default class Covid19 extends Component {
         return parts.join(".");
     }
 
+    handleChange = (e) => {
+        this.setState({
+            input: e.target.value
+        });
+    }
+
+    handleData = () => {
+        fetch("https://api.covid19api.com/summary")
+        .then(response => response.json())
+        .then((result) => {
+            this.setState({
+                isLoaded: true,
+                data: result
+            });
+        }).catch((error) => {
+            this.setState({
+                isLoaded: true,
+                error
+            });
+        })
+    }
+
     componentDidMount() {
-        fetch("https://api.covid19api.com/world?from=2020-10-03T23:59:00Z&to=2020-10-04T00:00:00")
+        fetch("https://api.covid19api.com/summary")
         .then(response => response.json())
         .then((result) => {
             this.setState({
@@ -65,42 +91,24 @@ export default class Covid19 extends Component {
                 <section className="container">
                     <article className="float-sm-left conf-cases conf-col">
                         <div className="cases">Total<br />Confirmed</div>
-                        <div className="numbers">
-                            {
-                                output.map((stats) => {
-                                    return this.handleNumbers(stats.TotalConfirmed);
-                                })
-                            }
-                        </div>
+                        <div className="numbers">{this.handleNumbers(output.Global.TotalConfirmed)}</div>
                     </article>
                     
                     <article className="float-sm-left recov-cases recov-col">
                         <div className="cases">Total<br />Recovered</div>
-                        <div className="numbers">
-                            {
-                                output.map((stats) => {
-                                    return this.handleNumbers(stats.TotalRecovered);
-                                })
-                            }
-                        </div>
+                        <div className="numbers">{this.handleNumbers(output.Global.TotalRecovered)}</div>
                     </article>
                     
                     <article className="float-sm-left death-cases death-col">
                         <div className="cases">Total<br />Deaths</div>
-                        <div className="numbers">
-                            {
-                                output.map((stats) => {
-                                    return this.handleNumbers(stats.TotalDeaths);
-                                })
-                            }
-                        </div>
+                        <div className="numbers">{this.handleNumbers(output.Global.TotalDeaths)}</div>
                     </article>
                 </section>
 
                 <section className="container">
                     <article className="search-bar">
-                        <input type="text" placeholder="Search by Country" />
-                        <button type="submit">Submit</button>
+                        <input type="text" placeholder="Search by Country" onChange={this.handleChange} />
+                        <button type="submit" onClick={this.handleData}>Submit</button>
                     </article>
                 </section>
 
@@ -113,6 +121,17 @@ export default class Covid19 extends Component {
                             <li>Recovered</li>
                             <li>Deceased</li>
                         </ul>
+                    </article>
+
+                    <article className="info-list">
+                        if(this.state.input === output.Countries.Country) {
+                            <ul>
+                                <li>{output.Countries.Country}</li>
+                                <li>{output.Countries.TotalConfirmed}</li>
+                                <li>{output.Countries.TotalRecovered}</li>
+                                <li>{output.Countries.TotalDeaths}</li>
+                            </ul>
+                        }
                     </article>
                 </section>
             </React.Fragment>
